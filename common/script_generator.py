@@ -77,12 +77,14 @@ class ImageGenerator(ScriptGenerator):
 
     def gen_text(self, attrs, varText, srcText):
         altText = ' '.join([attrs[0][0].strip(), attrs[0][3].strip()])
-        altText = altText.replace(' alt=""', "").replace('"', '\\"').strip()
+        altText = altText.replace(' alt=""', "").strip()
 
         if altText.count('%'):
             varText += '%s\n' % self.set_var(
                 '_%sAttrText' % self.attr_name, altText)
             altText = '${_%sAttrText}' % self.attr_name
+        else:
+            altText = altText.replace('"', '\\"')
 
         output = self.output_template % (varText, srcText, altText)
 

@@ -68,7 +68,7 @@ class ImageGeneratorTest(unittest.TestCase):
         self.assertEquals(
             scripts[0][0], '<img class="logo" src="/img/test.png" alt="<%=globalMessage %>">')
         self.assertEquals(
-            scripts[0][1], '<c:set var="_imgAttrText">class=\\"logo\\" alt=\\"<%=globalMessage %>\\"</c:set>\n' +
+            scripts[0][1], '<c:set var="_imgAttrText">class="logo" alt="<%=globalMessage %>"</c:set>\n' +
             '<r:register-img src="/img/test.png" attr="${_imgAttrText}" />')
         self.assertEquals(
             scripts[1][0], '<img class="logo" src="/img/test.png">')
@@ -85,7 +85,7 @@ class ImageGeneratorTest(unittest.TestCase):
         self.assertEquals(
             scripts[0][0], '<img class="logo" src="<%=baseUrl %>/img/test.png" alt="<%=globalMessage %>">')
         self.assertEquals(scripts[0][1], '<c:set var="_imgSrcText"><%=baseUrl %>/img/test.png</c:set>\n' +
-                          '<c:set var="_imgAttrText">class=\\"logo\\" alt=\\"<%=globalMessage %>\\"</c:set>\n' +
+                          '<c:set var="_imgAttrText">class="logo" alt="<%=globalMessage %>"</c:set>\n' +
                           '<r:register-img src="${_imgSrcText}" attr="${_imgAttrText}" />')
 
 
