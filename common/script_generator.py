@@ -89,3 +89,23 @@ class ImageGenerator(ScriptGenerator):
         output = self.output_template % (varText, srcText, altText)
 
         return output.replace(' attr=""', "")
+
+
+class HtmlImageGenerator(ScriptGenerator):
+    def __init__(self, tag_pattern, src_pattern, attr_name, output_template):
+        ScriptGenerator.__init__(
+            self, tag_pattern, src_pattern, attr_name, output_template)
+
+    def gen_src(self, attrs):
+        return attrs[0][1]
+
+    def gen_tag(self, m):
+        return m[0]
+
+    def gen_text(self, attrs, varText, srcText):
+        altText = ' '.join([attrs[0][0].strip(), attrs[0][3].strip()])
+        altText = altText.replace(' alt=""', "").strip()
+
+        if len(altText) > 0:
+            altText += ' '
+        return self.output_template % (srcText, altText)
