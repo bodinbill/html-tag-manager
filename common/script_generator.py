@@ -23,7 +23,8 @@ class ScriptGenerator:
 
         if len(matches):
             for m in matches:
-                script = self.gen_tag(m).replace('\r\n', '').replace(
+                originScript = self.gen_tag(m)
+                script = originScript.replace('\r\n', '').replace(
                     '\n', '').replace('\t', '').strip()
                 script = ' '.join(script.split())
 
@@ -43,7 +44,7 @@ class ScriptGenerator:
                             '_%sSrcText' % self.attr_name, src)
                         srcText = '${_%sSrcText}' % self.attr_name
 
-                    self.append(script_texts, script,
+                    self.append(script_texts, originScript,
                                 self.gen_text(attrs, varText, srcText))
 
         return script_texts
@@ -67,7 +68,9 @@ class ScriptGenerator:
 class ImageGenerator(ScriptGenerator):
     def __init__(self, tag_pattern, src_pattern, attr_name, output_template):
         ScriptGenerator.__init__(
-            self, tag_pattern, src_pattern, attr_name, output_template)
+            self, r'((<!--)? *([\'"]\s*(<.*>)?)?<img([\w\W]+?)[^%]>)',
+            r'(\S+\n*=\n*[\'"][\w\W]+[\'"])? *src\n*=\n*[\'"](.+\.(jpg|png|jpeg|gif|tiff|ico)\S*)[\'"] *(\S+\n*=\n*[\'"][\w\W]+[\'"])?',
+            'img', '%s<r:image src="%s" attr="%s" />')
 
     def gen_src(self, attrs):
         return attrs[0][1]
@@ -92,9 +95,11 @@ class ImageGenerator(ScriptGenerator):
 
 
 class HtmlImageGenerator(ScriptGenerator):
-    def __init__(self, tag_pattern, src_pattern, attr_name, output_template):
+    def __init__(self):
         ScriptGenerator.__init__(
-            self, tag_pattern, src_pattern, attr_name, output_template)
+            self, r'((<!--)? *([\'"]\s*(<.*>)?)?<img([\w\W]+?)[^%]>)',
+            r'(\S+\n*=\n*[\'"][\w\W]+[\'"])? *src\n*=\n*[\'"](.+\.(jpg|png|jpeg|gif|tiff|ico)\S*)[\'"] *(\S+\n*=\n*[\'"][\w\W]+[\'"])?',
+            'html', '<img src="//promo.11thcdn.com%s" %s/>')
 
     def gen_src(self, attrs):
         return attrs[0][1]
@@ -109,3 +114,21 @@ class HtmlImageGenerator(ScriptGenerator):
         if len(altText) > 0:
             altText += ' '
         return self.output_template % (srcText, altText)
+
+
+class JavascriptGenerator(ScriptGenerator):
+    def __init__(self):
+        ScriptGenerator.__init__(
+            self, r'((<!--)* *<script ([^ ]+)(\/>|>.*<\/script>))',
+            r'src\n*=\n*[\'"](.+\.js\S*)[\'"] *(charset=[\'"]\S+[\'"])* *(async)* *(defer)*',
+            'script', '%s<r:register-js src="%s" alt="%s"/>')
+
+    def gen_src(self, attrs):
+        return attrs[0][0]
+
+    def gen_text(self, attrs, varText, srcText):
+        altText = ' '.join(attrs[0][1:]).strip()
+
+        output = self.output_template % (varText, srcText, altText)
+
+        return output.replace(' alt=""', "")
